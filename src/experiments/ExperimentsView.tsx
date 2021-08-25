@@ -6,6 +6,7 @@ import { Link, Route } from 'react-router-dom';
 import ButtonEvent from './ButtonEvent';
 import HelloWorld from './HelloWorld';
 import HelloWorldProps from './HelloWorldProps';
+import MinimalState from './MinimalState';
 
 export default function ExperimentsView(): JSX.Element {
   return <section>
@@ -31,6 +32,11 @@ export default function ExperimentsView(): JSX.Element {
               Button is here
           </Link>
           </li>
+          <li>
+            <Link to='/experiments/minimal-state'>
+              Find your counter here
+            </Link>
+          </li>
         </ul>
       </nav>
       {/* Display */}
@@ -43,6 +49,9 @@ export default function ExperimentsView(): JSX.Element {
       </Route>
       <Route path='/experiments/button-event'>
         <ButtonEvent/>
+      </Route>
+      <Route path ='/experiments/minimal-state'>
+        <MinimalState/>
       </Route>
     </div>
   </section>
