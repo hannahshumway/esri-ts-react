@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { UserProfile } from './UsersView';
-import lodashSet from 'lodash/set';
-// import { set as lodashSet } from 'lodash';
+import { Address } from '@speedingplanet/rest-server';
+
+interface AddUserProps {
+  createUser: ( user: UserProfile ) => void;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 enum Country {
@@ -10,6 +13,44 @@ enum Country {
   UK,
   MX,
 }
+
+type UserReducerFields = keyof Omit<UserProfile, 'address'> | keyof Address;
+
+interface UserAction {
+  type: UserReducerFields;
+  payload: string;
+}
+
+function reducer( state: UserProfile, action: UserAction ) {
+  switch ( action.type ) {
+  case 'displayName':
+  case 'userType':
+    return { ...state, [action.type]: action.payload };
+  case 'street':
+  case 'city':
+  case 'state':
+  case 'postalCode':
+    return {
+      ...state,
+      address: { ...state.address, [action.type]: action.payload },
+    };
+  default:
+    throw new Error( 'Missed case!' );
+  }
+}
+
+/*
+const firstName = 'John';
+const person = {
+  // firstName: firstName,
+  firstName,
+};
+*/
+
+const actionCreator = ( type: UserReducerFields, payload: string ) => ( {
+  type,
+  payload,
+} );
 
 const initialState: UserProfile = {
   displayName: '',
@@ -22,38 +63,12 @@ const initialState: UserProfile = {
   },
 };
 
-interface AddUserProps {
-  createUser: ( user: UserProfile ) => void;
-}
-
 const AddUser = ( { createUser }: AddUserProps ): JSX.Element => {
-  const [ formState, setFormState ] = useState<UserProfile>( initialState );
-  const [ userAdded, setUserAdded ] = useState( false );
-
-  const updateFormState: React.FormEventHandler<
-  HTMLInputElement | HTMLSelectElement
-  > = ( event ) => {
-    const field = event.currentTarget;
-    const updatedState = { ...formState };
-    lodashSet( updatedState, field.name, field.value );
-    if ( userAdded ) setUserAdded( false );
-    setFormState( updatedState );
-  };
-
-  const handleClick = () => {
-    createUser( formState );
-    setUserAdded( true );
-  };
+  // const [ formState, setFormState ] = useState<UserProfile>( initialState );
+  const [ state, dispatch ] = useReducer( reducer, initialState );
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = ( event ) => {
-    console.log( 'Runs when the submit EVENT happens' );
-    const data = new FormData( event.currentTarget );
-
-    // @ts-expect-error
-    for ( let [ key, value ] of data.entries() ) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log( `${key} : ${value}` );
-    }
+    createUser( state );
     event.preventDefault();
   };
 
@@ -68,33 +83,47 @@ const AddUser = ( { createUser }: AddUserProps ): JSX.Element => {
           className="form-control"
           id="displayName"
           name="displayName"
-          value={formState.displayName}
-          onInput={updateFormState}
+          value={state.displayName}
+          onInput={( event ) =>
+            // dispatch( actionCreator( 'displayName', event.currentTarget.value ) )
+            dispatch( {
+              type: 'displayName',
+              payload: event.currentTarget.value,
+            } )
+          }
         />
       </div>
       <TextInput
-        fieldValue={formState.address.street}
-        changeInput={updateFormState}
+        fieldValue={state.address.street}
+        changeInput={( event ) =>
+          dispatch( actionCreator( 'street', event.currentTarget.value ) )
+        }
         label="Street"
-        fieldName="address.street"
+        fieldName="street"
       />
       <TextInput
-        fieldValue={formState.address.city}
-        changeInput={updateFormState}
+        fieldValue={state.address.city}
+        changeInput={( event ) =>
+          dispatch( actionCreator( 'city', event.currentTarget.value ) )
+        }
         label="City"
-        fieldName="address.city"
+        fieldName="city"
       />
       <TextInput
-        fieldValue={formState.address.state}
-        changeInput={updateFormState}
+        fieldValue={state.address.state}
+        changeInput={( event ) =>
+          dispatch( actionCreator( 'state', event.currentTarget.value ) )
+        }
         label="State"
-        fieldName="address.state"
+        fieldName="state"
       />
       <TextInput
-        fieldValue={formState.address.postalCode}
-        changeInput={updateFormState}
+        fieldValue={state.address.postalCode}
+        changeInput={( event ) =>
+          dispatch( actionCreator( 'postalCode', event.currentTarget.value ) )
+        }
         label="Postal Code"
-        fieldName="address.postalCode"
+        fieldName="postalCode"
       />
       {/*
       <div className="mb-3">
@@ -104,9 +133,9 @@ const AddUser = ( { createUser }: AddUserProps ): JSX.Element => {
         <select
           className="form-select"
           aria-label="Default select example"
-          value={formState.country}
+          value={state.country}
           name="country"
-          onChange={updateFormState}
+          onChange={(event) => actionCreator('', event.currentTarget.value)}
         >
           <option value="">Choose a country</option>
           <option value="USA">United States</option>
@@ -144,15 +173,9 @@ const AddUser = ( { createUser }: AddUserProps ): JSX.Element => {
         </div>
       </div>
       <div className="mb-3">
-        <button
-          className="btn btn-success"
-          type="submit"
-          onClick={handleClick}
-          disabled={userAdded}
-        >
+        <button className="btn btn-success" type="submit">
           Add User
         </button>
-        <p hidden={!userAdded}>User successfully added</p>
       </div>
     </form>
   );

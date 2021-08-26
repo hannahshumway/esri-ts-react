@@ -6,6 +6,8 @@ import { Link, Route } from 'react-router-dom';
 import ButtonEvent from './ButtonEvent';
 import HelloWorld from './HelloWorld';
 import HelloWorldProps from './HelloWorldProps';
+import LiveGreeter from './LiveGreeter';
+import LiveGreeterClass from './LiveGreeterClass';
 import MinimalState from './MinimalState';
 
 export default function ExperimentsView(): JSX.Element {
@@ -14,50 +16,62 @@ export default function ExperimentsView(): JSX.Element {
       <div className="col">
         <h2>Some Experiments are happening as we speak</h2>
       </div>
-    </div>
-    <div className="row">
-      {/* Navigation */}
-      <div className="col"></div>
-      <nav>
-        <ul>
-          <li><Link to='/experiments/hello-world'>
-              Hello, world (component)
-          </Link>
-          </li>
-          <li><Link to='/experiments/hello-world-props'>
-              What's good (props)
-          </Link>
-          </li>
-          <li><Link to='/experiments/button-event'>
-              Button is here
-          </Link>
-          </li>
-          <li>
-            <Link to='/experiments/minimal-state'>
-              Find your counter here
-            </Link>
-          </li>
-        </ul>
-      </nav>
-      {/* Display */}
-      <div className="col"></div>
-      <Route path='/experiments/hello-world'>
-        <HelloWorld/>
-      </Route>
-      <Route path='/experiments/hello-world-props'>
-        <HelloWorldProps message= "Greetings...as a property!"/>
-      </Route>
-      <Route path='/experiments/button-event'>
-        <ButtonEvent/>
-      </Route>
-      <Route path ='/experiments/minimal-state'>
-        <MinimalState/>
-      </Route>
-    </div>
-  </section>
-  ;
-  // shoutout to JSX for this
-  // export default allows you to import it without using curly braces; use only one default export per file
-  // the export default is conventional for react components
-  // classes in jsx are called className
-}
+      <div className="row">
+        {/* Navigation */}
+        <div className="col">
+          <nav>
+            <ul>
+              <li>
+                <Link to="/experiments/hello-world">
+                  Hello, world (component)!
+                </Link>
+              </li>
+              <li>
+                <Link to="/experiments/hello-world-props">
+                  Hello, world (props)!
+                </Link>
+              </li>
+              <li>
+                <Link to="/experiments/button-event">Event Handling</Link>
+              </li>
+              <li>
+                <Link to="/experiments/minimal-state">Minimal State</Link>
+              </li>
+              <li>
+                <Link to="/experiments/controlled-component">
+                  State and Input
+                </Link>
+              </li>
+              <li>
+                <Link to="/experiments/controlled-component-class">
+                  State and Input (class)
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        {/* Display */}
+        <div className="col">
+          <Route path="/experiments/hello-world">
+            <HelloWorld />
+          </Route>
+          <Route path="/experiments/hello-world-props">
+            <HelloWorldProps message="Greetings (as a property)!" />
+          </Route>
+          <Route path="/experiments/button-event">
+            <ButtonEvent />
+          </Route>
+          <Route path="/experiments/minimal-state">
+            <MinimalState />
+          </Route>
+          <Route path="/experiments/controlled-component">
+            <LiveGreeter />
+          </Route>
+          <Route path="/experiments/controlled-component-class">
+            <LiveGreeterClass />
+          </Route>
+        </div>
+      </div>
+    </section>
+  );
+};
